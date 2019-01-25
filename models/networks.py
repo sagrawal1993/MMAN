@@ -96,6 +96,7 @@ def set_bn_eval(m):
         m.eval()
 
 def get_norm_layer(norm_type='instance'):
+    print("\n\n norm type  " + norm_type + "  \n\n " )
     if norm_type == 'batch':
         norm_layer = functools.partial(nn.BatchNorm2d, affine=True)
     elif norm_type == 'instance':

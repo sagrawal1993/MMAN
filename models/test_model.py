@@ -14,11 +14,15 @@ class TestModel(BaseModel):
         BaseModel.initialize(self, opt)
         self.input_A = self.Tensor(opt.batchSize, opt.input_nc, opt.fineSize, opt.fineSize)
 
-        self.netG = networks.define_G(opt.input_nc, opt.output_nc,
+        """self.netG = networks.define_G(opt.input_nc, opt.output_nc,
                                       opt.ngf, opt.which_model_netG,
                                       opt.norm, not opt.no_dropout,
                                       opt.init_type,
                                       self.gpu_ids)
+        """
+        self.hook = networks.UnetHook()
+        self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.which_model_netG, self.hook, opt.fineSize, opt.norm, not opt.no_dropout, opt.init_type, self.gpu_ids)
+        
         which_epoch = opt.which_epoch
         self.load_network(self.netG, 'G', which_epoch)
 
@@ -34,7 +38,11 @@ class TestModel(BaseModel):
 
     def test(self):
         self.real_A = Variable(self.input_A)
-        self.fake_B = self.netG(self.real_A)
+        self.fake_B = self.netG(self.real_A)['GAN']
+        #print("real a")
+        #print(self.real_A.data)
+        #print("fake_a")
+        #print(self.fake_B.data)
 
     # get image paths
     def get_image_paths(self):
@@ -42,5 +50,5 @@ class TestModel(BaseModel):
 
     def get_current_visuals(self):
         real_A = util.tensor2im(self.real_A.data)
-        fake_B = util.tensor2im(self.fake_B.data)
+        fake_B = util.ndim_tensor2im(self.fake_B.data)
         return OrderedDict([('real_A', real_A), ('fake_B', fake_B)])
