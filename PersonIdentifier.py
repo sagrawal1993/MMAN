@@ -51,12 +51,12 @@ class PersonIdentifier:
         A = A.unsqueeze(0)
         A_path = " "
         input = {'A': A, 'A_paths': A_path}
-        print(A)
+        #print(A)
         self.model.set_input(input)
         self.model.test()
         fake_B = util.ndim_tensor2im(self.model.fake_B.data)
         resize_img = cv2.resize(fake_B, (cv2_im.shape[1],cv2_im.shape[0]), interpolation = cv2.INTER_AREA)
         res  = cv2.cvtColor(resize_img, cv2.COLOR_BGR2GRAY)        
-        vid_bw = cv2.threshold(res, 43, 255, cv2.THRESH_BINARY)[1]
-        img2_fg = cv2.bitwise_and(cv2_im, cv2_im, mask = vid_bw)
+        vid_bw = cv2.threshold(res, 43, 255, cv2.THRESH_BINARY_INV)[1]
+        img2_fg = cv2.bitwise_or(cv2_im,(255,255,255) ,cv2_im, mask = vid_bw)
         return img2_fg
